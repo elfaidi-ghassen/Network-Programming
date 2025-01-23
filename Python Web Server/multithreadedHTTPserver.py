@@ -51,90 +51,123 @@ class Log:
             file.write(f"{exception_desc} : {date}\n")
         self.mutex.release()
 
+# A simple thread safe couter
+class Counter:
+    def __init__(self, value=0):
+        self.value = value
+        self.lock = threading.Lock()
+    def increment(self):
+        with self.lock:
+            self.value += 1
+    def decrement(self):
+        with self.lock:
+            self.value -= 1
+
+    def get_value(self):
+        with self.lock:
+            return self.value
+
 class HTTPServer:
     def __init__(self, adress=("", 80), pending_queue_size=5):
         self.address = adress
         self.pending_queue_size = pending_queue_size
         self.logs = Log("logs.txt")
-        self.active_connections_counter = 0
-        self.counter_lock = threading.Lock()
+        self.active_connections_counter = Counter()
     def __create_response_headers(self, status_line, mime_type, content_length):
         current_date = datetime.now(timezone.utc).strftime("%a, %d %b %Y %X UTC")
         headers = [
             status_line,
             "Date: " + current_date,
-            "Server: Ghassen's HP laptop",
+            "Server: Ghassen's laptop",
             "Connection: close",
             "Content-Type: " + mime_type + "",
             "Content-Length: " + str(content_length)
         ]
+        
         return "\r\n".join(headers) + "\r\n\r\n"
     
     def __process_request(self, params):
         connection_socket, client_addr = params
         
-        self.counter_lock.acquire()
-        self.active_connections_counter += 1
-        print(f"Active Connections: {self.active_connections_counter:03}", end="\r")
-
-        self.counter_lock.release()
-
+        self.active_connections_counter.increment()
+        print(f"Active Connections: {self.active_connections_counter.get_value():03}", end="\r")
         current_date = datetime.now(timezone.utc).strftime("%a, %d %b %Y %X UTC")
         
         try:
             message = connection_socket.recv(1024).decode().split("\r\n")
-            
             request_line = message[0]
-            if not message:
-                connection_socket.close()
-                return
-
-            # e.g. GET /index.html HTTP/1.1
+            method = request_line.split()[0]
             filename = request_line.split()[1].lstrip("/")
             if not filename:
                 filename = "index.html"
-            with open(filename) as requested_file:
-                content = requested_file.read()
-            
+                
+            text_mime = ["text/html", "text/css", "text/javascript"]
+            image_mime = ["image/png", "image/jpeg"]
             
             mime_type = mimetypes.guess_type(filename)[0]
-            if not mime_type:
-                connection_socket.close()
-                return
+            if mime_type in text_mime:
+                content, status_line  = self.__get_file_content(filename, "r")
+            elif mime_type in image_mime:
+                content, status_line  = self.__get_file_content(filename, "rb")
+            else:
+                with open("404.html") as file:
+                    content = file.read()    
+                    status_line = "HTTP/1.1 404 not found"
+                    
+            if status_line == "HTTP/1.1 404 not found":
+                mime_type = "text/html"
             
-            status_line = "HTTP/1.1 200 OK"
-            output_headers = self.__create_response_headers(status_line, mime_type, len(content))
+            
+            match method:
+                case "GET":
+                    output_headers = self.__create_response_headers(status_line, mime_type, len(content))
+                    connection_socket.send(output_headers.encode())
+                    if mime_type in image_mime:
+                        connection_socket.send(content)
+                    else:
+                        connection_socket.send(content.encode())
+                    connection_socket.send("\r\n".encode())
+                case "HEAD":
+                    output_headers = self.__create_response_headers(status_line, mime_type, len(content))
+                    connection_socket.send(output_headers.encode())
+                case default:
+                    output_headers = "".join([
+                        "HTTP/1.1 405 Method Not Allowed" + "\r\n",
+                        "Date: " + current_date + "\r\n",
+                        "Server: Ghassen's laptop" + "\r\n",
+                        "Allow: GET, HEAD\r\n\r\n"
+                    ])
+                    connection_socket.send(output_headers.encode())
 
-            connection_socket.send(output_headers.encode())
-            connection_socket.send(content.encode())
-            connection_socket.send("\r\n".encode())
             connection_socket.close()
             self.logs.add_line(request_line, status_line, current_date, client_addr)
-        except FileNotFoundError as e:
-
-            with open("404.html") as file:
-                content = file.read()
-    
-            status_line = "HTTP/1.1 404 not found"
-            mime_type = mimetypes.guess_type(filename)[0]            
-            output_headers = self.__create_response_headers(status_line, "text/html", len(content))
-
-            connection_socket.send(output_headers.encode())
-            connection_socket.send(content.encode())
-            connection_socket.send("\r\n".encode())
-            connection_socket.close()
-            file.close()
-            self.logs.add_line(request_line, status_line, current_date, client_addr)
-
-            
+        
         except Exception as e:
+            output_headers = "".join([
+                "HTTP/1.1 500 Internal Server Error" + "\r\n",
+                "Date: " + current_date + "\r\n",
+                "Server: Ghassen's laptop" + "\r\n\r\n",
+                    ])
+            connection_socket.send(output_headers.encode())
             self.logs.add_error(e, current_date)
             connection_socket.close()
 
-        self.counter_lock.acquire()        
-        self.active_connections_counter -= 1
-        print(f"Active Connections: {self.active_connections_counter:03}", end="\r")
-        self.counter_lock.release()
+
+        self.active_connections_counter.decrement()
+        print(f"Active Connections: {self.active_connections_counter.get_value():03}", end="\r")
+
+    def __get_file_content(self, filename, mode):
+            try:
+                with open(filename, mode) as requested_file:
+                    content = requested_file.read()
+                return content, "HTTP/1.1 200 OK"
+            except FileNotFoundError as e:
+                with open("404.html") as file:
+                    content = file.read()    
+                return content, "HTTP/1.1 404 not found"
+
+
+
 
     def start(self):
         server_socket = socket(AF_INET, SOCK_STREAM)
