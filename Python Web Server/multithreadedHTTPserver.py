@@ -2,6 +2,9 @@ from socket import *
 from datetime import timezone, datetime
 import mimetypes
 import threading
+import os
+import traceback
+
 
 class ThreadPool:
     def __init__(self, fn, MAX_WORKERS, QUEUE_SIZE):
@@ -92,31 +95,44 @@ class HTTPServer:
         self.active_connections_counter.increment()
         print(f"Active Connections: {self.active_connections_counter.get_value():03}", end="\r")
         current_date = datetime.now(timezone.utc).strftime("%a, %d %b %Y %X UTC")
-        
+        text_mime = ["text/html", "text/css", "text/javascript"]
+        image_mime = ["image/png", "image/jpeg"]
+
         try:
             message = connection_socket.recv(1024).decode().split("\r\n")
             request_line = message[0]
             method = request_line.split()[0]
-            filename = request_line.split()[1].lstrip("/")
-            if not filename:
-                filename = "index.html"
-                
-            text_mime = ["text/html", "text/css", "text/javascript"]
-            image_mime = ["image/png", "image/jpeg"]
-            
-            mime_type = mimetypes.guess_type(filename)[0]
-            if mime_type in text_mime:
-                content, status_line  = self.__get_file_content(filename, "r")
-            elif mime_type in image_mime:
-                content, status_line  = self.__get_file_content(filename, "rb")
-            else:
-                with open("404.html") as file:
-                    content = file.read()    
-                    status_line = "HTTP/1.1 404 not found"
-                    
-            if status_line == "HTTP/1.1 404 not found":
+            filename = request_line.split()[1]
+            if filename == "/":
+                filename = "."
+            filename = filename.lstrip("/")
+            if os.path.isdir(filename):
+                status_line = "HTTP/1.1 200 OK"
                 mime_type = "text/html"
-            
+                content = "<ul style='list-style:none'>"
+                dirs = os.listdir(filename)
+                
+                for element in dirs:
+                    if filename == ".":
+                        content += f"<li><a href='{element}'>{element}</a></li>"
+                    else:
+                        content += f"<li><a href='{filename + "/" + element}'>{element}</a></li>"
+                        
+                content += "</ul>"
+            else:
+                
+                mime_type = mimetypes.guess_type(filename)[0]
+                if mime_type in text_mime:
+                    content, status_line  = self.__get_file_content(filename, "r")
+                elif mime_type in image_mime:
+                    content, status_line  = self.__get_file_content(filename, "rb")
+                else:
+                    content = "<p>This file type is not supported</p>"
+                    status_line = "HTTP/1.1 415 Unsupported Media Type"
+                    mime_type = "text/html"
+                if status_line == "HTTP/1.1 404 not found":
+                    mime_type = "text/html"
+                
             
             match method:
                 case "GET":
@@ -146,10 +162,11 @@ class HTTPServer:
             output_headers = "".join([
                 "HTTP/1.1 500 Internal Server Error" + "\r\n",
                 "Date: " + current_date + "\r\n",
-                "Server: Ghassen's laptop" + "\r\n\r\n",
-                    ])
+                "Server: Ghassen's laptop\r\n\r\n",
+                str(traceback.format_exc()),
+                "\r\n"])
             connection_socket.send(output_headers.encode())
-            self.logs.add_error(e, current_date)
+            self.logs.add_error(str(e) , current_date)
             connection_socket.close()
 
 
