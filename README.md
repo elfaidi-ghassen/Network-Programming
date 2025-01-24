@@ -15,5 +15,6 @@ One little expierement I did was to configure my home router to forward HTTP req
 - **Active Connection Monitoring**:
   - Uses a simple thread-safe counter to track and display the number of active connections in real time.
 - You can easily run the python script to run the server, you can optionally change the port number.
-
-
+- to try it, you can use your browser for testing, by entering some thing like "localhost/index.html" as url
+- I've wrote a simple client script to use for testing, `client.py`, which is like a simpler version of the `curl` command
+- to write, type in the command line python client.py GET localhost 80 /index.html
