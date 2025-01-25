@@ -1,6 +1,6 @@
 # Project 1: A Minimal Multithreaded Web Server
 
-This project implements a multithreaded HTTP server in Python using the socket API. It features a custom thread pool to efficiently handle client-server communication and supports basic HTTP methods like GET and HEAD (with no support for POST). This project helped me see how HTTP works at a fundamental level — and it was a really fun learning experience!
+This project implements a multithreaded HTTP server in Python using the socket API. It features a custom thread pool to efficiently handle client-server communication and supports basic HTTP methods like GET and HEAD (but it doesn't support POST). This project helped me see how HTTP works at a fundamental level — and it was a really fun learning experience!
 
 One little expierement I did was to configure my home router to forward HTTP requests to my laptop (the server) using a port mapping, to bypass NAT protocol, thus allowing anyone in the internet to access the server.
 
@@ -17,4 +17,4 @@ One little expierement I did was to configure my home router to forward HTTP req
 - You can easily run the python script to run the server, you can optionally change the port number.
 - to try it, you can use your browser for testing, by entering some thing like "localhost/index.html" as url
 - I've wrote a simple client script to use for testing, `client.py`, which is like a simpler version of the `curl` command
-- to write, type in the command line python client.py GET localhost 80 /index.html
+- to try it, type in the command line `python client.py GET localhost 80 /index.html`
