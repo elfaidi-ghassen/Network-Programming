@@ -27,7 +27,7 @@ class ThreadPool:
             self.full.acquire()
             try:
                 with self.mutex:
-                    task = self.tasks_queue.pop()
+                    task = self.tasks_queue.pop(0)
                     self.fn(task)
             finally:
                 self.empty.release()
@@ -71,7 +71,7 @@ class Counter:
             return self.value
 
 class HTTPServer:
-    def __init__(self, adress=("", 80), pending_queue_size=5):
+    def __init__(self, adress=("", 8080), pending_queue_size=5):
         self.address = adress
         self.pending_queue_size = pending_queue_size
         self.logs = Log("logs.txt")
