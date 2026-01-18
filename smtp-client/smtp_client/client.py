@@ -65,7 +65,6 @@ class Client:
     client_socket.connect(self.mailserver)
     current_state = "WAITING_FOR_GREETING"
     while current_state not in {"DONE", "ERROR"}:
-      print(current_state)
       if current_state == "SENDING_ATTACHMENTS":
         if attachments == None:
           response = "NO_ATTACHMENT"
