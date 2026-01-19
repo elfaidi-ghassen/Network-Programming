@@ -1,78 +1,15 @@
 from socket import *
 from datetime import timezone, datetime
 import mimetypes
-import threading
 import os
 import traceback
-
-
-class ThreadPool:
-    def __init__(self, fn, MAX_WORKERS, QUEUE_SIZE):
-        self.MAX_WORKERS = MAX_WORKERS
-        self.QUEUE_SIZE = QUEUE_SIZE
-        self.fn = fn
-        
-        self.full = threading.Semaphore(0)
-        self.empty = threading.Semaphore(QUEUE_SIZE)
-        self.mutex = threading.Semaphore(1)
-        self.tasks_queue = []
-        
-        self.workers = [threading.Thread(target=self.__worker) for _ in range(MAX_WORKERS)]
-        for thread in self.workers:
-            thread.start()
-
-
-    def __worker(self):
-        while True:
-            self.full.acquire()
-            try:
-                with self.mutex:
-                    task = self.tasks_queue.pop(0)
-                    self.fn(task)
-            finally:
-                self.empty.release()
-    
-    def add_task(self, task):
-        self.empty.acquire()
-        with self.mutex:
-            self.tasks_queue.append(task)
-        self.full.release()
-class Log:
-    def __init__(self, filename):
-        self.filename = filename
-        self.mutex = threading.Lock()
-
-    def add_line(self, request_line, status_line, date, client_addr):
-        self.mutex.acquire()
-        with open(self.filename, "a") as file:
-            file.write(f"REQUEST({client_addr[0]}): {request_line} -> RESPONSE: {status_line} : {date}\n")
-        self.mutex.release()
-
-    def add_error(self, exception_desc, date):
-        self.mutex.acquire()
-        with open(self.filename, "a") as file:
-            file.write(f"{exception_desc} : {date}\n")
-        self.mutex.release()
-
-# A simple thread safe couter
-class Counter:
-    def __init__(self, value=0):
-        self.value = value
-        self.lock = threading.Lock()
-    def increment(self):
-        with self.lock:
-            self.value += 1
-    def decrement(self):
-        with self.lock:
-            self.value -= 1
-
-    def get_value(self):
-        with self.lock:
-            return self.value
+from threadpool import ThreadPool 
+from log import Log
+from counter import Counter
 
 class HTTPServer:
-    def __init__(self, adress=("", 8080), pending_queue_size=5):
-        self.address = adress
+    def __init__(self, port=8080, pending_queue_size=5):
+        self.address = ("", port)
         self.pending_queue_size = pending_queue_size
         self.logs = Log("logs.txt")
         self.active_connections_counter = Counter()
@@ -187,9 +124,12 @@ class HTTPServer:
 
 
     def start(self):
+        # create a TCP "welcoming" socket
         server_socket = socket(AF_INET, SOCK_STREAM)
+        # bind the the server address
         server_socket.bind(self.address)
         server_socket.listen(self.pending_queue_size)
+        
         max_pool_workers = 10
         max_queue_size = 50
         thread_pool = ThreadPool(self.__process_request, max_pool_workers, max_queue_size)
@@ -200,5 +140,5 @@ class HTTPServer:
             thread_pool.add_task((connection_socket, addr))
 
 
-web_server = HTTPServer(pending_queue_size=5)
+web_server = HTTPServer(port=8080)
 web_server.start()
