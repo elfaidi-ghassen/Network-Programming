@@ -6,6 +6,9 @@ import traceback
 from threadpool import ThreadPool 
 from log import Log
 from counter import Counter
+import argparse
+
+
 
 class HTTPServer:
     def __init__(self, port=8080, pending_queue_size=5):
@@ -140,5 +143,10 @@ class HTTPServer:
             thread_pool.add_task((connection_socket, addr))
 
 
-web_server = HTTPServer(port=8080)
+parser = argparse.ArgumentParser(description="HTTP Server")
+parser.add_argument("--port", type=int, default=8080, help="Port number (default: 8080)")
+args = parser.parse_args()
+
+
+web_server = HTTPServer(args.port)
 web_server.start()
