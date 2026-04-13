@@ -53,3 +53,48 @@ REQUEST(127.0.0.1): GET /favicon.ico HTTP/1.1 -> RESPONSE: HTTP/1.1 415 Unsuppor
 REQUEST(127.0.0.1): GET /index.html HTTP/1.1 -> RESPONSE: HTTP/1.1 200 OK : Wed, 21 Jan 2026 23:56:05 UTC
 REQUEST(127.0.0.1): GET /favicon.ico HTTP/1.1 -> RESPONSE: HTTP/1.1 415 Unsupported Media Type : Wed, 21 Jan 2026 23:56:05 UTC
 list index out of range : Wed, 21 Jan 2026 23:56:05 UTC
+REQUEST(127.0.0.1): GET / HTTP/1.1 -> RESPONSE: HTTP/1.1 200 OK : Mon, 13 Apr 2026 21:54:06 UTC
+REQUEST(127.0.0.1): GET /favicon.ico HTTP/1.1 -> RESPONSE: HTTP/1.1 415 Unsupported Media Type : Mon, 13 Apr 2026 21:54:07 UTC
+REQUEST(127.0.0.1): GET /index.html HTTP/1.1 -> RESPONSE: HTTP/1.1 200 OK : Mon, 13 Apr 2026 21:54:10 UTC
+REQUEST(127.0.0.1): GET /favicon.ico HTTP/1.1 -> RESPONSE: HTTP/1.1 415 Unsupported Media Type : Mon, 13 Apr 2026 21:54:10 UTC
+REQUEST(127.0.0.1): GET /index.html HTTP/1.1 -> RESPONSE: HTTP/1.1 200 OK : Mon, 13 Apr 2026 21:57:54 UTC
+REQUEST(127.0.0.1): GET /vid.mp4 HTTP/1.1 -> RESPONSE: HTTP/1.1 415 Unsupported Media Type : Mon, 13 Apr 2026 21:57:55 UTC
+REQUEST(127.0.0.1): GET /favicon.ico HTTP/1.1 -> RESPONSE: HTTP/1.1 415 Unsupported Media Type : Mon, 13 Apr 2026 21:57:55 UTC
+REQUEST(127.0.0.1): GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1 -> RESPONSE: HTTP/1.1 415 Unsupported Media Type : Mon, 13 Apr 2026 21:57:56 UTC
+REQUEST(127.0.0.1): GET /index.html HTTP/1.1 -> RESPONSE: HTTP/1.1 200 OK : Mon, 13 Apr 2026 21:59:30 UTC
+REQUEST(127.0.0.1): GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1 -> RESPONSE: HTTP/1.1 415 Unsupported Media Type : Mon, 13 Apr 2026 21:59:31 UTC
+'bytes' object has no attribute 'encode' : Mon, 13 Apr 2026 21:59:31 UTC
+REQUEST(127.0.0.1): GET /favicon.ico HTTP/1.1 -> RESPONSE: HTTP/1.1 415 Unsupported Media Type : Mon, 13 Apr 2026 21:59:31 UTC
+'bytes' object has no attribute 'encode' : Mon, 13 Apr 2026 21:59:32 UTC
+'bytes' object has no attribute 'encode' : Mon, 13 Apr 2026 21:59:45 UTC
+list index out of range : Mon, 13 Apr 2026 21:59:45 UTC
+REQUEST(127.0.0.1): GET /index.html HTTP/1.1 -> RESPONSE: HTTP/1.1 200 OK : Mon, 13 Apr 2026 22:01:36 UTC
+REQUEST(127.0.0.1): GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1 -> RESPONSE: HTTP/1.1 415 Unsupported Media Type : Mon, 13 Apr 2026 22:01:36 UTC
+REQUEST(127.0.0.1): GET /vid.mp4 HTTP/1.1 -> RESPONSE: HTTP/1.1 200 OK : Mon, 13 Apr 2026 22:01:37 UTC
+REQUEST(127.0.0.1): GET /favicon.ico HTTP/1.1 -> RESPONSE: HTTP/1.1 415 Unsupported Media Type : Mon, 13 Apr 2026 22:01:37 UTC
+REQUEST(127.0.0.1): GET /favicon.ico HTTP/1.1 -> RESPONSE: HTTP/1.1 415 Unsupported Media Type : Mon, 13 Apr 2026 22:01:39 UTC
+REQUEST(127.0.0.1): GET /index.html HTTP/1.1 -> RESPONSE: HTTP/1.1 200 OK : Mon, 13 Apr 2026 22:01:40 UTC
+REQUEST(127.0.0.1): GET /vid.mp4 HTTP/1.1 -> RESPONSE: HTTP/1.1 200 OK : Mon, 13 Apr 2026 22:01:59 UTC
+REQUEST(127.0.0.1): GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1 -> RESPONSE: HTTP/1.1 415 Unsupported Media Type : Mon, 13 Apr 2026 22:01:59 UTC
+REQUEST(127.0.0.1): GET /favicon.ico HTTP/1.1 -> RESPONSE: HTTP/1.1 415 Unsupported Media Type : Mon, 13 Apr 2026 22:01:59 UTC
+REQUEST(127.0.0.1): GET /favicon.ico HTTP/1.1 -> RESPONSE: HTTP/1.1 415 Unsupported Media Type : Mon, 13 Apr 2026 22:02:04 UTC
+REQUEST(127.0.0.1): GET /index.html HTTP/1.1 -> RESPONSE: HTTP/1.1 200 OK : Mon, 13 Apr 2026 22:02:04 UTC
+REQUEST(127.0.0.1): GET /vid.mp4 HTTP/1.1 -> RESPONSE: HTTP/1.1 200 OK : Mon, 13 Apr 2026 22:02:10 UTC
+REQUEST(127.0.0.1): GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1 -> RESPONSE: HTTP/1.1 415 Unsupported Media Type : Mon, 13 Apr 2026 22:02:11 UTC
+REQUEST(127.0.0.1): GET /favicon.ico HTTP/1.1 -> RESPONSE: HTTP/1.1 415 Unsupported Media Type : Mon, 13 Apr 2026 22:02:11 UTC
+REQUEST(127.0.0.1): GET /favicon.ico HTTP/1.1 -> RESPONSE: HTTP/1.1 415 Unsupported Media Type : Mon, 13 Apr 2026 22:02:11 UTC
+REQUEST(127.0.0.1): GET /index.html HTTP/1.1 -> RESPONSE: HTTP/1.1 200 OK : Mon, 13 Apr 2026 22:02:20 UTC
+REQUEST(127.0.0.1): GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1 -> RESPONSE: HTTP/1.1 415 Unsupported Media Type : Mon, 13 Apr 2026 22:02:21 UTC
+REQUEST(127.0.0.1): GET /vid.mp4 HTTP/1.1 -> RESPONSE: HTTP/1.1 200 OK : Mon, 13 Apr 2026 22:02:21 UTC
+REQUEST(127.0.0.1): GET /favicon.ico HTTP/1.1 -> RESPONSE: HTTP/1.1 415 Unsupported Media Type : Mon, 13 Apr 2026 22:02:21 UTC
+REQUEST(127.0.0.1): GET /favicon.ico HTTP/1.1 -> RESPONSE: HTTP/1.1 415 Unsupported Media Type : Mon, 13 Apr 2026 22:02:22 UTC
+REQUEST(127.0.0.1): GET /index.html HTTP/1.1 -> RESPONSE: HTTP/1.1 200 OK : Mon, 13 Apr 2026 22:06:05 UTC
+REQUEST(127.0.0.1): GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1 -> RESPONSE: HTTP/1.1 415 Unsupported Media Type : Mon, 13 Apr 2026 22:06:05 UTC
+REQUEST(127.0.0.1): GET /vid.mp4 HTTP/1.1 -> RESPONSE: HTTP/1.1 200 OK : Mon, 13 Apr 2026 22:06:05 UTC
+REQUEST(127.0.0.1): GET /favicon.ico HTTP/1.1 -> RESPONSE: HTTP/1.1 415 Unsupported Media Type : Mon, 13 Apr 2026 22:06:05 UTC
+REQUEST(127.0.0.1): GET /favicon.ico HTTP/1.1 -> RESPONSE: HTTP/1.1 415 Unsupported Media Type : Mon, 13 Apr 2026 22:24:55 UTC
+REQUEST(127.0.0.1): GET /index.html HTTP/1.1 -> RESPONSE: HTTP/1.1 200 OK : Mon, 13 Apr 2026 22:24:55 UTC
+REQUEST(127.0.0.1): GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1 -> RESPONSE: HTTP/1.1 415 Unsupported Media Type : Mon, 13 Apr 2026 22:25:02 UTC
+REQUEST(127.0.0.1): GET /favicon.ico HTTP/1.1 -> RESPONSE: HTTP/1.1 415 Unsupported Media Type : Mon, 13 Apr 2026 22:25:04 UTC
+REQUEST(127.0.0.1): GET /vid.mp4 HTTP/1.1 -> RESPONSE: HTTP/1.1 200 OK : Mon, 13 Apr 2026 22:25:04 UTC
+list index out of range : Mon, 13 Apr 2026 22:25:04 UTC

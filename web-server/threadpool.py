@@ -13,21 +13,26 @@ class ThreadPool:
         self.empty = threading.Semaphore(QUEUE_SIZE)
         self.mutex = threading.Semaphore(1)
         self.tasks_queue = []
-        
+        self.running = True
         self.workers = [threading.Thread(target=self.__worker) for _ in range(MAX_WORKERS)]
         for thread in self.workers:
             thread.start()
 
     def __worker(self):
-        while True:
+        while self.running:
             self.full.acquire()
+            if self.running == False:
+                break
             try: # callback(task) could throw an error
                 with self.mutex:
                     task = self.tasks_queue.pop(0)
                     self.callback(task)
             finally:
                 self.empty.release()
-    
+    def close(self):
+        self.running = False
+        for _ in range(self.MAX_WORKERS):
+            self.full.release()
     def add_task(self, task):
         self.empty.acquire()
         with self.mutex:

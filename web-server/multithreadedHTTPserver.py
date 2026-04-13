@@ -1,13 +1,14 @@
-from socket import *
-from datetime import timezone, datetime
+import argparse
 import mimetypes
 import os
 import traceback
-from threadpool import ThreadPool 
-from log import Log
+from datetime import datetime, timezone
+from socket import *
+import signal
 from counter import Counter
-import argparse
-
+from log import Log
+from threadpool import ThreadPool
+import sys
 
 
 class HTTPServer:
@@ -16,6 +17,8 @@ class HTTPServer:
         self.pending_queue_size = pending_queue_size
         self.logs = Log("logs.txt")
         self.active_connections_counter = Counter()
+        self.running = True # used for graceful shutdown
+
     def __create_response_headers(self, status_line, mime_type, content_length):
         current_date = datetime.now(timezone.utc).strftime("%a, %d %b %Y %X UTC")
         headers = [
@@ -37,7 +40,7 @@ class HTTPServer:
         current_date = datetime.now(timezone.utc).strftime("%a, %d %b %Y %X UTC")
         text_mime = ["text/html", "text/css", "text/javascript"]
         image_mime = ["image/png", "image/jpeg"]
-
+        video_mime = ["video/mp4"]
         try:
             message = connection_socket.recv(1024).decode().split("\r\n")
             request_line = message[0]
@@ -66,6 +69,8 @@ class HTTPServer:
                     content, status_line  = self.__get_file_content(filename, "r")
                 elif mime_type in image_mime:
                     content, status_line  = self.__get_file_content(filename, "rb")
+                elif mime_type in video_mime:
+                    content, status_line  = self.__get_file_content(filename, "rb")
                 else:
                     content = "<p>This file type is not supported</p>"
                     status_line = "HTTP/1.1 415 Unsupported Media Type"
@@ -79,6 +84,8 @@ class HTTPServer:
                     output_headers = self.__create_response_headers(status_line, mime_type, len(content))
                     connection_socket.send(output_headers.encode())
                     if mime_type in image_mime:
+                        connection_socket.send(content)
+                    if mime_type in video_mime:
                         connection_socket.send(content)
                     else:
                         connection_socket.send(content.encode())
@@ -129,6 +136,9 @@ class HTTPServer:
     def start(self):
         # create a TCP "welcoming" socket
         server_socket = socket(AF_INET, SOCK_STREAM)
+        # the call to accept should not block, so that we can check self.running
+        # otherwise when the user shuts the server down, we might be stuck in accept
+        server_socket.settimeout(1.0)
         # bind the the server address
         server_socket.bind(self.address)
         server_socket.listen(self.pending_queue_size)
@@ -137,10 +147,26 @@ class HTTPServer:
         max_queue_size = 50
         thread_pool = ThreadPool(self.__process_request, max_pool_workers, max_queue_size)
         print("...the server is ready...")
+        self.running = True
+        signal.signal(signal.SIGINT, self.hundle_shutdown)
         
-        while True:
-            connection_socket, addr = server_socket.accept()
-            thread_pool.add_task((connection_socket, addr))
+        while self.running:
+            try:
+                connection_socket, addr = server_socket.accept()
+                thread_pool.add_task((connection_socket, addr))
+            except TimeoutError:
+                continue
+        thread_pool.close()
+        server_socket.close()
+        print("server is down.")
+        sys.exit(0)
+    def hundle_shutdown(self, sig, frame):
+        print("\nshutting down...")
+        print("please wait...")
+        self.running = False
+
+
+
 
 
 parser = argparse.ArgumentParser(description="HTTP Server")
